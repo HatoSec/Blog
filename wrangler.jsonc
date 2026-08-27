@@ -1,0 +1,21 @@
+{
+	"compatibility_date": "2026-06-09",
+	"compatibility_flags": [
+		"global_fetch_strictly_public"
+	],
+	"name": "blog-hatosec",
+	"main": "@astrojs/cloudflare/entrypoints/server",
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS"
+	},
+	"kv_namespaces": [
+		{"binding": "SESSION", "id": "0b2dee9bcf8e436ea3a0387143cd911f"}
+	],
+	"observability": {
+		"enabled": true
+	},
+	"routes": [
+		{"custom_domain": true, "pattern": "hatosec.com"}
+	]
+}

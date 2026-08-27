@@ -1,0 +1,190 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import { getCollection } from 'astro:content';
+import { SITE_DESCRIPTION, SITE_TITLE, AUDIENCES, audienceBadge, tagSlug } from '../consts';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			.hero {
+				text-align: center;
+				padding: 2em 0 1em;
+			}
+			.hero h1 {
+				font-size: 2.5em;
+				margin-bottom: 0.3em;
+			}
+			.hero p {
+				font-size: 1.1em;
+				color: rgb(var(--gray));
+				max-width: 640px;
+				margin: 0 auto 1.5em;
+			}
+			.age-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: 1.25rem;
+				margin: 2em 0;
+			}
+			.age-card {
+				background: rgb(38, 42, 58);
+				border: 2px solid rgb(50, 56, 74);
+				border-radius: 0;
+				padding: 1.5em;
+				text-align: center;
+				text-decoration: none;
+				transition: 0.2s ease;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			}
+			.age-card:hover {
+				border-color: var(--accent);
+				box-shadow: var(--box-shadow);
+				transform: translateY(-3px);
+			}
+			.age-card .range {
+				font-size: 2.2em;
+				font-weight: 400;
+				color: rgb(var(--black));
+				font-family: 'Jersey 10', sans-serif;
+			}
+			.age-card .label {
+				font-size: 1.4em;
+				color: rgb(var(--black));
+				margin-top: 0.2em;
+				font-family: 'Jersey 10', sans-serif;
+			}
+			.age-card {
+				cursor: pointer;
+			}
+			.section-title {
+				font-size: 1.5em;
+				margin: 2em 0 0.5em;
+			}
+			.posts-list {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+			}
+			.posts-list li {
+				padding: 1em 0;
+				border-bottom: 1px solid rgb(50, 56, 74);
+			}
+			.posts-list li:last-child {
+				border-bottom: none;
+			}
+			.posts-list a {
+				text-decoration: none;
+				display: block;
+			}
+			.posts-list a:hover h3 {
+				color: var(--accent);
+			}
+			.posts-list h3 {
+				margin: 0 0 0.3em;
+				color: rgb(var(--black));
+				transition: 0.2s ease;
+			}
+			.post-meta {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.3em;
+				font-size: 0.8em;
+				color: rgb(var(--gray));
+				margin: 0;
+			}
+			.audience-badge {
+				display: inline-block;
+				font-size: 0.7em;
+				padding: 0.1em 0.45em;
+				border-radius: 3px;
+				background: rgb(50, 56, 74);
+				color: rgb(var(--gray-dark));
+			}
+			.tag-badge {
+				display: inline-block;
+				font-size: 0.7em;
+				padding: 0.1em 0.45em;
+				border-radius: 3px;
+		background: #dc2626;
+			color: #fff;
+				text-decoration: none;
+			}
+			.tag-badge:hover {
+				opacity: 0.8;
+			}
+			.empty-state {
+				color: rgb(var(--gray));
+				text-align: center;
+				padding: 2em;
+			}
+			@media (max-width: 720px) {
+				.hero h1 { font-size: 1.8em; }
+				.age-grid { grid-template-columns: 1fr 1fr; }
+			}
+		</style>
+	</head>
+	<body>
+		<Header activeAudience="all" />
+		<main>
+		<section class="hero">
+				<h1>Cyber Security Training</h1>
+				<h3>For Everyone</h3>
+				<h4>For Free</h4>
+				<p>
+					Select your age range below to view relevant training.
+				</p>
+			</section>
+
+			<div class="age-grid">
+				{AUDIENCES.map((a) => (
+					<a class="age-card" href={`/blog/${a.id}`}>
+						<div class="range">{a.range}</div>
+						<div class="label">{a.label}</div>
+					</a>
+				))}
+				<a class="age-card" href="/blog">
+					<div class="range">All Ages</div>
+				</a>
+			</div>
+
+			<h2 class="section-title">Latest Posts</h2>
+			{posts.length > 0 ? (
+				<ul class="posts-list">
+					{posts.slice(0, 5).map((post) => (
+						<li>
+							<a href={`/blog/${post.id}/`}>
+								<h3>{post.data.title}</h3>
+								<p class="post-meta">
+									<FormattedDate date={post.data.pubDate} />
+									{post.data.audience?.map((a) => (
+										<span class="audience-badge">{audienceBadge(a)}</span>
+									))}
+									{post.data.tags?.map((tag) => (
+										<a href={`/blog/tags/${tagSlug(tag)}/`} class="tag-badge">{tag}</a>
+									))}
+								</p>
+							</a>
+						</li>
+					))}
+				</ul>
+			) : (
+				<p class="empty-state">No posts yet — check back soon for new guides!</p>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>

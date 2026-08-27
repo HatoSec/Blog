@@ -1,0 +1,283 @@
+---
+import { type CollectionEntry, getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseHead from './BaseHead.astro';
+import Footer from './Footer.astro';
+import FormattedDate from './FormattedDate.astro';
+import Header from './Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE, AUDIENCES } from '../consts';
+
+export interface Props {
+	audienceId: string;
+}
+
+const { audienceId } = Astro.props;
+
+const allPosts = await getCollection('blog');
+const filteredPosts = allPosts
+	.filter((p) => (p.data.audience ?? []).includes(audienceId))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+	const audienceInfo = AUDIENCES.find((a) => a.id === audienceId);
+	const hasPosts = filteredPosts.length > 0;
+	const isKids = audienceId === 'kids';
+	const isTeens = audienceId === 'teens';
+	const isYoungAdults = audienceId === 'young-adults';
+	const isAdults = audienceId === 'adults';
+	const isSeniors = audienceId === 'seniors';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead
+			title={`${audienceInfo?.label ?? audienceId} Training — ${SITE_TITLE}`}
+			description={audienceInfo?.description ?? SITE_DESCRIPTION}
+		/>
+		<style>
+			main {
+				width: 960px;
+				max-width: calc(100% - 2em);
+			}
+			h1 {
+				margin-bottom: 0.3em;
+			}
+			.posts-grid {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 2rem;
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+			}
+			.posts-grid li {
+				width: 100%;
+				text-align: center;
+				margin-bottom: 1rem;
+			}
+			.posts-grid li * {
+				text-decoration: none;
+				transition: 0.2s ease;
+			}
+			.posts-grid li img {
+				width: 100%;
+			}
+			.title {
+				font-size: 2.369rem;
+			}
+			.posts-grid li img {
+				margin-bottom: 0.5rem;
+				border-radius: 12px;
+			}
+			.posts-grid li a {
+				display: block;
+			}
+			.title {
+				margin: 0;
+				color: rgb(var(--black));
+				line-height: 1;
+			}
+			.date {
+				margin: 0;
+				color: rgb(var(--gray));
+			}
+			.description {
+				margin: 0.4em 0;
+				color: rgb(var(--gray-dark));
+				font-size: 0.9em;
+				line-height: 1.5;
+			}
+			.posts-grid li a:hover h4,
+			.posts-grid li a:hover .date {
+				color: rgb(var(--accent));
+			}
+			.posts-grid a:hover img {
+				box-shadow: var(--box-shadow);
+			}
+			.empty-state {
+				color: rgb(var(--gray));
+				text-align: center;
+				padding: 3em;
+				width: 100%;
+			}
+			.audience-page {
+				--accent-red: #f04444;
+				--accent-blue: #5b7dfa;
+				--bg: #1a1d26;
+				--card: #262a3a;
+				--border: #363c52;
+				--text: #e0e4ec;
+				--muted: #9ca3b8;
+				background: var(--bg);
+				min-height: 100vh;
+			}
+			.audience-page .hero {
+				text-align: center;
+				padding: 0 0 1em;
+			}
+			.audience-page h1 {
+				font-size: 1.7em;
+				color: var(--text);
+				margin: 0.4em 0 0.1em;
+				font-weight: 700;
+				letter-spacing: -0.03em;
+			}
+			.audience-page h1 .accent {
+				color: var(--accent-red);
+			}
+			.audience-page h1 .tag {
+				display: inline-block;
+				font-size: 0.5em;
+				padding: 0.2em 0.8em;
+				border-radius: 6px;
+				vertical-align: middle;
+				margin-left: 0.6em;
+				background: var(--accent-blue);
+				color: white;
+				font-weight: 600;
+				letter-spacing: 0;
+			}
+			.audience-page .subtitle {
+				font-size: 1em;
+				color: var(--muted);
+				margin-bottom: 2em;
+			}
+			.audience-page main {
+				width: 960px;
+				max-width: calc(100% - 2em);
+				position: relative;
+				z-index: 1;
+			}
+			.audience-page .posts-grid {
+				gap: 1.5rem;
+			}
+			.audience-page .posts-grid li a {
+				background: var(--card);
+				border-radius: 12px;
+				padding: 1.5em;
+				border: 1px solid var(--border);
+				box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+				transition: 0.2s ease;
+			}
+			.audience-page .posts-grid li a:hover {
+				border-color: var(--accent-blue);
+				box-shadow: 0 4px 16px rgba(35, 55, 255, 0.08);
+				transform: translateY(-2px);
+			}
+			.audience-page .title {
+				color: var(--text);
+				font-weight: 600;
+			}
+			.audience-page .posts-grid li a:hover h4 {
+				color: var(--accent-blue);
+			}
+			.audience-page .description {
+				color: var(--muted);
+				font-size: 0.88em;
+				margin: 0.5em 0;
+				line-height: 1.55;
+			}
+			.audience-page .date {
+				color: #94a3b8;
+				font-size: 0.82em;
+			}
+			.audience-page .posts-grid a:hover img {
+				box-shadow: 0 4px 16px rgba(35, 55, 255, 0.1);
+			}
+			.audience-page .empty-state {
+				color: var(--muted);
+				background: var(--card);
+				border-radius: 12px;
+				padding: 3em;
+				border: 1px solid var(--border);
+			}
+			@media (max-width: 720px) {
+				.posts-grid {
+					gap: 1em;
+				}
+				.title {
+					font-size: 1.563em;
+				}
+				.empty-state {
+					font-size: 0.9em;
+					padding: 2em 1em;
+				}
+			}
+		</style>
+	</head>
+	<body class="audience-page">
+		<Header activeAudience={audienceId} />
+		<main>
+			{isKids && (
+				<section class="hero">
+					<h1>
+						<span class="accent">Kids</span> Training
+						<span class="tag">Ages 8-12</span>
+					</h1>
+					<p class="subtitle">Fun guides to help you stay safe and smart online!</p>
+				</section>
+			)}
+			{isTeens && (
+				<section class="hero">
+					<h1>
+						<span class="accent">Teens</span> Training
+						<span class="tag">Ages 13-19</span>
+					</h1>
+					<p class="subtitle">Stay sharp. Spot the scams. Own your digital life.</p>
+				</section>
+			)}
+			{isYoungAdults && (
+				<section class="hero">
+					<h1>
+						<span class="accent">Young Adults</span> Training
+						<span class="tag">Ages 20-29</span>
+					</h1>
+					<p class="subtitle">Practical cybersecurity for your digital life and career.</p>
+				</section>
+			)}
+			{isAdults && (
+				<section class="hero">
+					<h1>
+						<span class="accent">Adults</span> Training
+						<span class="tag">Ages 30-59</span>
+					</h1>
+					<p class="subtitle">Protect your family, your data, and your peace of mind.</p>
+				</section>
+			)}
+			{isSeniors && (
+				<section class="hero">
+					<h1>
+						<span class="accent">Seniors</span> Training
+						<span class="tag">Ages 60+</span>
+					</h1>
+					<p class="subtitle">Stay safe online with clear, practical guidance.</p>
+				</section>
+			)}
+			{!isKids && !isTeens && !isYoungAdults && !isAdults && !isSeniors && (
+				<h1>{audienceInfo?.label} Training</h1>
+			)}
+			{hasPosts && (
+				<ul class="posts-grid">
+					{filteredPosts.map((post) => (
+						<li>
+							<a href={`/blog/${post.id}/`}>
+								{post.data.heroImage && (
+									<Image width={720} height={360} src={post.data.heroImage} alt="" />
+								)}
+								<h4 class="title">{post.data.title}</h4>
+								<p class="description">{post.data.description}</p>
+								<p class="date">
+									<FormattedDate date={post.data.pubDate} />
+								</p>
+							</a>
+						</li>
+					))}
+				</ul>
+			)}
+			{!hasPosts && (
+				<p class="empty-state">No guides yet for this age group — check back soon!</p>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>

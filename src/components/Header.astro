@@ -1,0 +1,221 @@
+---
+import { SITE_TITLE, AUDIENCES } from '../consts';
+import HeaderLink from './HeaderLink.astro';
+
+export interface Props {
+	activeAudience?: string;
+}
+
+const { activeAudience } = Astro.props;
+---
+
+<header>
+	<nav>
+		<a href="/">
+				<img src="/logo.png" alt="HatoSec" class="site-logo site-logo--mobile" />
+				<img src="/hatosec.png" alt="HatoSec" class="site-logo site-logo--desktop" />
+			</a>
+		<div class="internal-links">
+			<HeaderLink href="/">Home</HeaderLink>
+			<HeaderLink href="/blog">Blog</HeaderLink>
+			<HeaderLink href="/about">About</HeaderLink>
+		</div>
+		{activeAudience != null ? (
+			<div class="hamburger-wrap">
+				<button id="hamburger-btn" class="hamburger-btn" aria-label="Choose age group" aria-expanded="false">
+					<span class="hamburger-btn-label">Age Group</span>
+					<span class="hamburger-icon">
+						<span class="hamburger-line"></span>
+						<span class="hamburger-line"></span>
+						<span class="hamburger-line"></span>
+					</span>
+				</button>
+				<ul id="audience-menu" class="audience-menu" hidden>
+					<li><a href="/blog" class:list={['menu-link', { active: activeAudience === 'all' }]}>All Ages</a></li>
+					{AUDIENCES.map((a) => (
+						<li><a href={`/blog/${a.id}`} class:list={['menu-link', { active: activeAudience === a.id }]}>{a.label} ({a.range})</a></li>
+					))}
+				</ul>
+				<script>
+					(function() {
+						const btn = document.getElementById('hamburger-btn');
+						const menu = document.getElementById('audience-menu');
+						if (!btn || !menu) return;
+						btn.addEventListener('click', function(e) {
+							e.stopPropagation();
+							const open = menu.hasAttribute('hidden');
+							menu.toggleAttribute('hidden');
+							btn.setAttribute('aria-expanded', String(open));
+						});
+						document.addEventListener('click', function(e) {
+							if (!menu.hasAttribute('hidden') && !btn.contains(e.target) && !menu.contains(e.target)) {
+								menu.setAttribute('hidden', '');
+								btn.setAttribute('aria-expanded', 'false');
+							}
+						});
+					})();
+				</script>
+			</div>
+		) : (
+			<h2><a href="/" class="site-title">{SITE_TITLE}</a></h2>
+		)}
+	</nav>
+</header>
+<style>
+	header {
+		margin: 0;
+		padding: 0.4em 1em;
+		background: white;
+		box-shadow: 0 2px 8px rgba(15, 18, 25, 5%);
+	}
+	h2 {
+		margin: 0;
+		font-size: 1em;
+	}
+
+	.site-title {
+		font-family: 'Jersey 10', sans-serif;
+		font-size: 2em;
+		line-height: 1;
+	}
+	h2 a,
+	h2 a.active {
+		text-decoration: none;
+	}
+	nav {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+	}
+	.internal-links {
+		display: flex;
+		gap: 0.25em;
+	}
+	.internal-links a {
+		min-width: 2em;
+		text-align: center;
+	}
+	h2 {
+		position: absolute;
+		right: 0;
+		margin: 0;
+		font-size: 1em;
+		white-space: nowrap;
+	}
+	nav a {
+		padding: 0.3em 0.4em;
+		color: rgb(15, 18, 25);
+		border-top: 4px solid transparent;
+		border-bottom: 4px solid transparent;
+		text-decoration: none;
+		font-family: 'Jersey 10', sans-serif;
+		font-size: 1.3em;
+	}
+	nav > a:first-child {
+		padding: 0;
+	}
+	nav a.active {
+		text-decoration: none;
+		color: #fff;
+		background: rgb(15, 18, 25);
+		border-bottom: 4px solid var(--accent);
+		border-top: 4px solid red;
+	}
+	.site-logo {
+		position: absolute;
+		left: 0;
+		height: 2.5em;
+		width: auto;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+	.site-logo--desktop {
+		display: none;
+	}
+	@media (min-width: 721px) {
+		.site-logo--mobile {
+			display: none;
+		}
+		.site-logo--desktop {
+			display: block;
+		}
+	}
+	.hamburger-wrap {
+		position: absolute;
+		right: 0;
+		z-index: 100;
+	}
+	.hamburger-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.4em;
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0.4em 0.3em;
+		font-family: inherit;
+		font-size: 0.78em;
+		color: rgb(96, 115, 159);
+		white-space: nowrap;
+	}
+	.hamburger-btn-label {
+		order: 0;
+		font-family: 'Jersey 10', sans-serif;
+		font-size: 1.8em;
+		color: rgb(15, 18, 25);
+	}
+	.hamburger-icon {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		order: 1;
+	}
+	.hamburger-line {
+		display: block;
+		width: 18px;
+		height: 2px;
+		background: rgb(15, 18, 25);
+		border-radius: 1px;
+	}
+	.audience-menu {
+		list-style: none;
+		margin: 0;
+		padding: 0.4em 0;
+		position: absolute;
+		right: 0;
+		top: 100%;
+		background: white;
+		border: 1px solid rgb(229, 233, 240);
+		border-radius: 8px;
+		box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+		min-width: 200px;
+	}
+	.audience-menu li {
+		margin: 0;
+	}
+	.menu-link {
+		display: block;
+		padding: 0.5em 1em;
+		color: rgb(15, 18, 25);
+		text-decoration: none;
+		font-size: 0.9em;
+		font-family: 'Jersey 10', sans-serif;
+		white-space: nowrap;
+	}
+	.menu-link:hover {
+		background: rgb(229, 233, 240);
+	}
+	.menu-link.active {
+		background: rgb(15, 18, 25);
+		color: white;
+		font-weight: 400;
+		border-top: 4px solid red;
+		border-bottom: 4px solid var(--accent);
+	}
+	@media (max-width: 720px) {
+		.hamburger-btn-label {
+			display: none;
+		}
+	}
+</style>

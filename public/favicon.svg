@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+    text {
+      fill: #000;
+      font-family: 'Jersey 10', sans-serif;
+      font-size: 96px;
+    }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #FFF; }
+    }
+  </style>
+  <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle">HS</text>
+</svg>

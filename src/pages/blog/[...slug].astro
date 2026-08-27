@@ -1,0 +1,43 @@
+---
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+import AudienceListing from '../../components/AudienceListing.astro';
+import { AUDIENCES } from '../../consts';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog');
+	const postPaths = posts.map((post) => ({
+		params: { slug: post.id },
+		props: { type: 'post' as const, post },
+	}));
+	const audiencePaths = AUDIENCES.map((a) => ({
+		params: { slug: a.id },
+		props: { type: 'audience' as const, audienceId: a.id },
+	}));
+	return [...postPaths, ...audiencePaths];
+}
+
+type Props =
+	| { type: 'post'; post: CollectionEntry<'blog'> }
+	| { type: 'audience'; audienceId: string };
+
+const props = Astro.props;
+
+const isPost = props.type === 'post';
+let post = isPost ? props.post : null;
+let Content: any;
+if (post) {
+	const result = await render(post);
+	Content = result.Content;
+}
+---
+
+{isPost && post && (
+	<BlogPost {...post.data}>
+		<Content />
+	</BlogPost>
+)}
+
+{!isPost && (
+	<AudienceListing audienceId={props.audienceId} />
+)}
